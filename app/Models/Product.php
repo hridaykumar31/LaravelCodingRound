@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
-class post extends Model
+class Product extends Model
 {
-   protected $fillable = ['title', 'content'];
-   
+ protected $fillable = ['name', 'description', 'price', 'stock', 'sku', 'category_id', 'image'];
+
    public function comments() {
       return $this->hasMany(Comment::class);
    }
@@ -27,8 +28,9 @@ class post extends Model
     return $this->belongsToMany(Tag::class);
    }
 
-   public function category() {
-      return $this->belongsTo(Category::class);
-   }
+   public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 
 }

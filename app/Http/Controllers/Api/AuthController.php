@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-use App\Models\user;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +32,6 @@ class AuthController extends Controller
         ], 404);
     }
 
-
     //return response()->json(['message' => $request->all()], 200);
     //Store all the user data into the database
     
@@ -41,16 +40,60 @@ class AuthController extends Controller
         'email' => $request->email,
         'password' => Hash::make($request->password),
     ]);
-   
+
+//$token = $user->creteToken('user-token', [user])->plainTextToken;
+ $token = $user->createToken('user-token', ['user'])->plainTextToken;
 
   return response()->json([
     'id' => $user->id,
     'name' => $user->name,
     'email' => $user->email,
+    'token' => $token,
     'created_at' => $user->created_at
   ], 200);
-
    }
+
+  public function login(Request $request) {
+//return response()->json("okkkkkk", 200);
+    $validate = Validator::make($request->all(),[
+      'email' => 'required|email',
+      'password' => 'required|min:6'
+    ]);
+
+    if($validate->fails()) {
+      return response()->json([
+        'errors' => $validate->errors()
+      ], 422);
+    }
+    $user = User::where('email', $request->email)->first();
+
+    if(!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['message' => 'Invalid credentials'], 401);
+    }
+
+    $userType = $user->role === 'admin' ? ['admin'] : ['user'];
+
+    $token = $user->createToken('login-token', $userType)->plainTextToken;
+
+    return response()->json([
+      'message' => 'User logged in successfully',
+      'token' => $token,
+      'user' => $user,
+    ], 200);
+    
+   }
+
+    public function index() {
+      
+    $user = User::all();
+    
+    $authenticated_user = auth()->user();
+
+    return response()->json([
+    'authenticateUser' => $authenticated_user,
+    ], 200);
+   }
+   
 
 
 }

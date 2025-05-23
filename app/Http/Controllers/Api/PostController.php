@@ -14,19 +14,23 @@ class PostController extends Controller
 
     // use validate function to cheak each of the input is valid or not
       $validate_data = $request->validate([
-        'title' => 'required |string',
-        'content' => 'required | string',
+        'title' => 'required|string',
+        'content' => 'required|string',
+        'tag_ids' => 'required|array',
+        'tag_ids.*' => 'exists:tags,id'
       ]);
 
 
     //store all the input data into the db after validation
-     Post::create([
+    $post = Post::create([
         'title' => $request->title,
         'content' => $request->content
-     ]);
+    ]);
+    $post->tags()->attach($validate_data['tag_ids']);
 
       return response()->json([
-        'message' => 'Post Created Successfully'
+        'message' => 'Post Created Successfully',
+        'post' => $validate_data
       ], 201);
    }
    public function show($id) {
@@ -36,4 +40,23 @@ class PostController extends Controller
 
      return response()->json($single_post,);
    }
+   public function update(Request $request, $id) {
+    $post = Post::findorFail($id);
+    $post->update([
+       'title' => $request->title,
+       'content' => $request->content
+    ]);
+
+    return response()->json([
+      'message' => 'Post updated successfully',
+    ], 200);
+   }
+    public function destroy($id) {
+    $post = Post::findorFail($id);
+    $post->delete();
+
+    return response()->json([
+      'message' => 'Post deleted successfully',
+    ], 200);
+  }
 }
