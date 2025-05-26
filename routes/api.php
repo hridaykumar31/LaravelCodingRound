@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
     //All Route for user auth Task-2
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
@@ -32,6 +34,12 @@ use App\Http\Controllers\Api\ProductController;
     Route::post('/comments/like/{id}', [LikeController::class, 'LikeComment']);
     Route::post('/comments/dislike/{id}', [LikeController::class, 'disLikeComment']);
 
+    //Add to cart route handler
+    Route::post('/cart/add/{id}', [CartController::class, 'addToCart']);
+    Route::get('/cart/getCartItems', [CartController::class, 'getCartItems']);
+
+    //Add order route handler
+    Route::post('/orders/place', [OrderController::class, 'placeOrder']);
 });
 
    //Middleware for admin

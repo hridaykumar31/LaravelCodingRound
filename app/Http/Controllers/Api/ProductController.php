@@ -14,6 +14,10 @@ class ProductController extends Controller
 
 
   public function store(Request $request){
+
+    return response()->json($request->all(), 200);
+    $path = null;
+
     try {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -29,7 +33,7 @@ class ProductController extends Controller
 
         if($request->hasFile('image')) {
             $imageName = time().'_'.$request->image->getClientOriginalName();
-            $request->image->storeAs('products', $imageName, 'public');
+            $path = $request->image->storeAs('products', $imageName, 'public');
             $validated['image'] = $imageName;
         }
 
@@ -39,6 +43,7 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'Product Created Successfully',
             'product' => $product->load('tags'),
+            'path' => $path,
         ], 201);
 
     } catch (\Exception $e) {
@@ -79,7 +84,6 @@ class ProductController extends Controller
       if(isset($validated['tag_ids'])) {
         $product->tags()->sync($validated['tag_ids']);
       }
-
 
     return response()->json([
       'message' => 'Post updated successfully',

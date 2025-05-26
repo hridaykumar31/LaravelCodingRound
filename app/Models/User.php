@@ -22,6 +22,23 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    public function carts() {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function orders() {
+        return $this->hasMany(Order::class);
+    }
+
+    public function products() {
+        return $this->hasMany(Product::class);
+    }
+
+    public function activeCart() {
+        return $this->carts()->where('status', 'active')->latest()->first();
+    }
+
+
 
    
 }
